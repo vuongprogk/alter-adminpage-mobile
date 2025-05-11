@@ -1,5 +1,5 @@
 import { useMemo } from "react";
-import { FiHome, FiPaperclip } from "react-icons/fi";
+import { FiHome, FiMap, FiPaperclip, FiUsers } from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router";
 
 const RouteSelect = () => {
@@ -8,7 +8,8 @@ const RouteSelect = () => {
 
   const routes = useMemo(() => [
     { title: "Dashboard", icon: FiHome, path: "/" },
-    { title: "Invoices", icon: FiPaperclip, path: "/invoices" },
+    { title: "Tour", icon: FiMap, path: "/tours" },
+    { title: "User", icon: FiUsers, path: "/users" },
   ], []);
 
   return (
