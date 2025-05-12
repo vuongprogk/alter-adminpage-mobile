@@ -233,7 +233,7 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
 
           <button
             type="submit"
-            className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all"
+            className="w-full bg-purple-700 text-white py-3 rounded-lg font-semibold hover:bg-purple-800 transition-all"
           >
             {isEdit ? "Update Tour" : "Create Tour"}
           </button>

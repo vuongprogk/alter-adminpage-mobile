@@ -56,3 +56,10 @@ export interface Booking {
   tourId: string;
   bookingDate: string;
 }
+
+export interface Service {
+  id: string;
+  tourId: string;
+  name: string;
+  description: string;
+}

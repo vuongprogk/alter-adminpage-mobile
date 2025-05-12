@@ -18,6 +18,7 @@ const RouteSelect = () => {
       { title: "Tour", icon: FiMap, path: "/tours" },
       { title: "User", icon: FiUsers, path: "/users" },
       { title: "Book", icon: FiPaperclip, path: "/bookings" },
+      { title: "Services", icon: FiSettings, path: "/services" },
     ],
     []
   );
