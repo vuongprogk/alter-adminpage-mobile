@@ -40,7 +40,14 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
         : createTourRequest(data, imageFile!);
     },
     onSuccess: () => {
-      navigate("/tours");
+      alert(
+        isEdit ? "Tour updated successfully!" : "Tour created successfully!"
+      );
+      if (isEdit) {
+        navigate(`/tour/${params?.tourId}`);
+      } else {
+        navigate("/tours");
+      }
     },
   });
 
@@ -88,104 +95,150 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
     mutation.mutate({ data: form, imageFile: imageFile || undefined });
   };
 
-  if (isEdit && isLoading) return <div>Loading...</div>;
-  if (isEdit && isError) return <div>Error loading tour</div>;
+  if (isEdit && isLoading)
+    return (
+      <div className="text-center text-purple-600 text-xl mt-10">
+        Loading...
+      </div>
+    );
+  if (isEdit && isError)
+    return (
+      <div className="text-center text-red-600 text-xl mt-10">
+        Error loading tour
+      </div>
+    );
 
   return (
-    <div className="p-6 max-w-4xl mx-auto bg-white rounded-lg shadow">
-      <h2 className="text-2xl font-bold mb-4 text-purple-600">
-        {isEdit ? "Edit Tour" : "Create Tour"}
-      </h2>
+    <div className="p-8 bg-gradient-to-r from-purple-50 via-gray-50 to-purple-50 min-h-screen">
+      <div className="max-w-4xl mx-auto bg-white rounded-3xl shadow-2xl p-8">
+        <h2 className="text-4xl font-extrabold text-purple-700 mb-8 text-center">
+          {isEdit ? "Edit Tour" : "Create Tour"}
+        </h2>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <input
-          className="w-full border p-2 rounded"
-          name="name"
-          value={form.name}
-          onChange={handleChange}
-          placeholder="Tour Name"
-        />
-        <textarea
-          className="w-full border p-2 rounded"
-          name="description"
-          value={form.description}
-          onChange={handleChange}
-          placeholder="Description"
-        />
-        <input
-          className="w-full border p-2 rounded"
-          name="destination"
-          value={form.destination}
-          onChange={handleChange}
-          placeholder="Destination"
-        />
-        <input
-          className="w-full border p-2 rounded"
-          name="price"
-          type="number"
-          value={form.price}
-          onChange={handleChange}
-          placeholder="Price"
-        />
-        <input
-          className="w-full border p-2 rounded"
-          name="startDate"
-          type="date"
-          value={form.startDate}
-          onChange={handleChange}
-        />
-        <input
-          className="w-full border p-2 rounded"
-          name="endDate"
-          type="date"
-          value={form.endDate}
-          onChange={handleChange}
-        />
-
-        {/* Image Upload */}
-        <div>
-          <label className="block font-medium mb-1">Upload Image</label>
-          <input type="file" accept="image/*" onChange={handleFileChange} />
-        </div>
-
-        {/* Show existing image in edit mode */}
-        {isEdit && data?.imageUrl && !imageFile && (
+        <form onSubmit={handleSubmit} className="space-y-6">
           <div>
-            <p className="text-gray-500">Current Image:</p>
-            <img
-              src={`http://localhost:5000/${data.imageUrl}`}
-              alt="Current"
-              className="w-64 h-auto rounded shadow"
+            <label className="block font-semibold text-gray-700 mb-2">
+              Tour Name
+            </label>
+            <input
+              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              name="name"
+              value={form.name}
+              onChange={handleChange}
+              placeholder="Enter the tour name"
             />
           </div>
-        )}
 
-        {imageFile && (
           <div>
-            <p className="text-gray-500">New Image Preview:</p>
-            <img
-              src={URL.createObjectURL(imageFile)}
-              alt="Preview"
-              className="w-64 h-auto rounded shadow"
+            <label className="block font-semibold text-gray-700 mb-2">
+              Description
+            </label>
+            <textarea
+              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              name="description"
+              value={form.description}
+              onChange={handleChange}
+              placeholder="Enter a detailed description"
+              rows={4}
             />
           </div>
-        )}
 
-        <button
-          type="submit"
-          className="bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700"
-        >
-          {isEdit ? "Update Tour" : "Create Tour"}
-        </button>
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Destination
+            </label>
+            <input
+              className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+              name="destination"
+              value={form.destination}
+              onChange={handleChange}
+              placeholder="Enter the destination"
+            />
+          </div>
 
-        {mutation.isSuccess && (
-          <p className="text-green-600 mt-2">
-            {isEdit
-              ? "Tour updated successfully."
-              : "Tour created successfully."}
-          </p>
-        )}
-      </form>
+          <div className="grid grid-cols-5 gap-4">
+            <div className="col-span-1">
+              <label className="block font-semibold text-gray-700 mb-2">
+                Price
+              </label>
+              <input
+                className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                name="price"
+                type="number"
+                value={form.price}
+                onChange={handleChange}
+                placeholder="Enter the price"
+              />
+            </div>
+            <div className="grid grid-cols-2 col-span-4 gap-4">
+              <div>
+                <label className="block font-semibold text-gray-700 mb-2">
+                  Start Date
+                </label>
+                <input
+                  className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  name="startDate"
+                  type="date"
+                  value={form.startDate}
+                  onChange={handleChange}
+                />
+              </div>
+              <div>
+                <label className="block font-semibold text-gray-700 mb-2">
+                  End Date
+                </label>
+                <input
+                  className="w-full border border-gray-300 p-3 rounded-lg focus:ring-2 focus:ring-purple-500 focus:outline-none"
+                  name="endDate"
+                  type="date"
+                  value={form.endDate}
+                  onChange={handleChange}
+                />
+              </div>
+            </div>
+          </div>
+
+          <div>
+            <label className="block font-semibold text-gray-700 mb-2">
+              Tour Image
+            </label>
+            <div
+              className="w-64 h-40 border-2 border-dashed border-gray-400 rounded-lg flex items-center justify-center cursor-pointer hover:border-purple-600 transition-all"
+              onClick={() => document.getElementById("imageInput")?.click()}
+            >
+              {imageFile ? (
+                <img
+                  src={URL.createObjectURL(imageFile)}
+                  alt="Preview"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : isEdit && data?.imageUrl ? (
+                <img
+                  src={`http://localhost:5000/${data.imageUrl}`}
+                  alt="Current"
+                  className="w-full h-full object-cover rounded-lg"
+                />
+              ) : (
+                <span className="text-gray-400">Click to upload image</span>
+              )}
+            </div>
+            <input
+              id="imageInput"
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleFileChange}
+            />
+          </div>
+
+          <button
+            type="submit"
+            className="w-full bg-purple-600 text-white py-3 rounded-lg font-semibold hover:bg-purple-700 transition-all"
+          >
+            {isEdit ? "Update Tour" : "Create Tour"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 };

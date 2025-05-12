@@ -1,7 +1,15 @@
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useCookies } from "react-cookie";
 import { useNavigate } from "react-router";
 import { registerRequest } from "~/api/auth";
+
+const debounce = (func: Function, delay: number) => {
+  let timer: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timer);
+    timer = setTimeout(() => func(...args), delay);
+  };
+};
 
 export default function Register() {
   const navigate = useNavigate();
@@ -62,6 +70,9 @@ export default function Register() {
     }
   };
 
+  const debouncedSetUsername = useCallback(debounce(setUsername, 300), []);
+  const debouncedSetPassword = useCallback(debounce(setPassword, 300), []);
+
   return (
     <>
       <h1 className="text-2xl font-bold mb-2">Register</h1>
@@ -79,7 +90,7 @@ export default function Register() {
             type="text"
             className="w-full mt-1 px-3 py-2 border rounded outline-none focus:ring-2 focus:ring-violet-500"
             value={username}
-            onChange={(e) => setUsername(e.target.value)}
+            onChange={(e) => debouncedSetUsername(e.target.value)}
             required
           />
         </div>
@@ -93,13 +104,16 @@ export default function Register() {
             type="password"
             className="w-full mt-1 px-3 py-2 border rounded outline-none focus:ring-2 focus:ring-violet-500"
             value={password}
-            onChange={(e) => setPassword(e.target.value)}
+            onChange={(e) => debouncedSetPassword(e.target.value)}
             required
           />
         </div>
 
         <div>
-          <label htmlFor="confirm-password" className="block text-sm font-medium">
+          <label
+            htmlFor="confirm-password"
+            className="block text-sm font-medium"
+          >
             Confirm Password
           </label>
           <input

@@ -21,3 +21,38 @@ export interface TourFormInput {
   endDate: string;   // ISO format
   description: string;
 }
+
+export interface CreateUserRequest {
+  userName: string;
+  password: string;
+  role: number;
+}
+
+export interface UpdateUserRequest {
+  name?: string;
+  email?: string;
+}
+
+export interface Role {
+  role: string;
+}
+
+export interface User {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+}
+
+export interface CreateBookingRequest {
+  username: string;
+  tourId: string;
+  bookingDate: string;
+}
+
+export interface Booking {
+  id: string;
+  username: string;
+  tourId: string;
+  bookingDate: string;
+}

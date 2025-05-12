@@ -1,16 +1,26 @@
 import { useMemo } from "react";
-import { FiHome, FiMap, FiPaperclip, FiUsers } from "react-icons/fi";
+import {
+  FiHome,
+  FiMap,
+  FiPaperclip,
+  FiUsers,
+  FiSettings,
+} from "react-icons/fi";
 import { useLocation, useNavigate } from "react-router";
 
 const RouteSelect = () => {
   const location = useLocation();
   const navigate = useNavigate();
 
-  const routes = useMemo(() => [
-    { title: "Dashboard", icon: FiHome, path: "/" },
-    { title: "Tour", icon: FiMap, path: "/tours" },
-    { title: "User", icon: FiUsers, path: "/users" },
-  ], []);
+  const routes = useMemo(
+    () => [
+      { title: "Dashboard", icon: FiHome, path: "/" },
+      { title: "Tour", icon: FiMap, path: "/tours" },
+      { title: "User", icon: FiUsers, path: "/users" },
+      { title: "Book", icon: FiPaperclip, path: "/bookings" },
+    ],
+    []
+  );
 
   return (
     <div className="space-y-1">
@@ -20,14 +30,18 @@ const RouteSelect = () => {
           <button
             key={path}
             onClick={() => navigate(path)}
-            className={`flex items-center gap-2 w-full rounded px-2 py-1.5 text-sm transition ${
+            className={`flex items-center gap-3 w-full rounded px-3 py-2 text-sm transition ${
               selected
-                ? "bg-white text-stone-950 shadow"
-                : "hover:bg-stone-200 text-stone-500"
+                ? "bg-violet-100 text-violet-900 shadow dark:bg-violet-800 dark:text-white"
+                : "hover:bg-stone-200 text-stone-500 dark:hover:bg-stone-700 dark:text-stone-300"
             }`}
             aria-current={selected ? "page" : undefined}
           >
-            <Icon className={selected ? "text-violet-500" : ""} />
+            <Icon
+              className={`text-lg ${
+                selected ? "text-violet-500" : "dark:text-stone-400"
+              }`}
+            />
             <span>{title}</span>
           </button>
         );

@@ -1,5 +1,7 @@
 import axios, { type AxiosRequestConfig, type Method } from 'axios';
 
+const cache = new Map();
+
 export const apiClient = axios.create({
   baseURL: 'http://localhost:5000/api',
   timeout: 5000,
@@ -15,6 +17,11 @@ export const sendRequest = async (
   data: any = null,
   isFormData: boolean = false
 ) => {
+  const cacheKey = `${method}:${url}`;
+  if (method === 'GET' && cache.has(cacheKey)) {
+    return cache.get(cacheKey);
+  }
+
   try {
     const config: AxiosRequestConfig = {
       url,
@@ -32,6 +39,9 @@ export const sendRequest = async (
     }
 
     const response = await apiClient(config);
+    if (method === 'GET') {
+      cache.set(cacheKey, response.data);
+    }
     return response.data;
   } catch (error) {
     console.error('API request error:', error);

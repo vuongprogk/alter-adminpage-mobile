@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { getTourByIdRequest } from "~/api/tour";
+import { getServiceByTourIdRequest } from "~/api/service"; // Import service API
 
 const Tour = ({
   params,
@@ -13,6 +14,17 @@ const Tour = ({
   const { data, isLoading, isError } = useQuery({
     queryKey: ["tour", params.tourId],
     queryFn: () => getTourByIdRequest(params.tourId),
+    staleTime: 1000 * 60 * 5,
+    retry: false,
+  });
+
+  const {
+    data: services,
+    isLoading: isServicesLoading,
+    isError: isServicesError,
+  } = useQuery({
+    queryKey: ["services", params.tourId],
+    queryFn: () => getServiceByTourIdRequest(params.tourId),
     staleTime: 1000 * 60 * 5,
     retry: false,
   });
@@ -38,35 +50,70 @@ const Tour = ({
     );
   }
 
+  const placeholderImage = "https://via.placeholder.com/600x400?text=No+Image";
+
   return (
-    <div className="p-6 bg-gray-50 min-h-screen">
+    <div className="p-8 bg-gradient-to-r from-gray-50 via-purple-50 to-gray-50 min-h-screen">
       <div className="max-w-4xl mx-auto bg-white rounded-xl shadow-lg p-6">
-        <h1 className="text-3xl font-bold text-purple-600 mb-4">{data.name}</h1>
-        <img
-          src={`http://localhost:5000/${data.imageUrl}`}
-          alt={data.name}
-          className="w-full max-h-96 object-cover rounded-lg shadow mb-6"
-        />
-        <p className="text-gray-600 mb-2">
-          <span className="font-semibold">Description:</span> {data.description}
-        </p>
-        <p className="text-gray-600 mb-1">
-          <span className="font-semibold">Destination:</span> {data.destination}
-        </p>
-        <p className="text-gray-600 mb-1">
-          <span className="font-semibold">Price:</span> ${data.price.toFixed(2)}
-        </p>
-        <p className="text-gray-600 mb-1">
-          <span className="font-semibold">Start Date:</span>{" "}
-          {formatDate(data.startDate)}
-        </p>
-        <p className="text-gray-600 mb-1">
-          <span className="font-semibold">End Date:</span>{" "}
-          {formatDate(data.endDate)}
-        </p>
-        <div className="mt-4 flex justify-end">
+        <h1 className="text-4xl font-extrabold text-purple-700 mb-6 text-center">
+          {data.name}
+        </h1>
+        <div className="relative overflow-hidden rounded-lg shadow-lg mb-8">
+          <img
+            src={
+              data.imageUrl
+                ? `http://localhost:5000/${data.imageUrl}`
+                : placeholderImage
+            }
+            alt={data.name}
+            className="w-full max-h-96 object-cover transition-transform duration-300 ease-in-out hover:scale-105"
+            loading="lazy"
+          />
+        </div>
+        <div className="space-y-4">
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Description:</span>{" "}
+            {data.description}
+          </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Destination:</span>{" "}
+            {data.destination}
+          </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Price:</span>{" "}
+            <span className="text-green-600 font-bold">
+              ${data.price.toFixed(2)}
+            </span>
+          </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Start Date:</span>{" "}
+            {formatDate(data.startDate)}
+          </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">End Date:</span>{" "}
+            {formatDate(data.endDate)}
+          </p>
+        </div>
+        <div className="mt-6">
+          <h2 className="text-2xl font-bold text-purple-700 mb-4">Services</h2>
+          {isServicesLoading ? (
+            <p className="text-gray-500">Loading services...</p>
+          ) : isServicesError || !services ? (
+            <p className="text-red-500">Error loading services.</p>
+          ) : (
+            <ul className="list-disc list-inside space-y-2">
+              {services.map((service: any) => (
+                <li key={service.id} className="text-gray-700">
+                  <span className="font-semibold">{service.name}:</span>{" "}
+                  <span>{service.description}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+        <div className="mt-6 flex justify-center">
           <button
-            className="bg-purple-600 text-white px-4 py-2 rounded-lg shadow hover:bg-purple-700 transition"
+            className="bg-gradient-to-r from-purple-600 to-purple-800 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:from-purple-700 hover:to-purple-900 hover:scale-105 dark:shadow-none dark:bg-purple-700 dark:hover:bg-purple-800"
             onClick={() => navigate(`/tour/form/${data.id}`)}
           >
             Edit Tour
