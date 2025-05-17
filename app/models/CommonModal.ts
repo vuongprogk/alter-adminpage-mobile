@@ -12,6 +12,8 @@ export interface Tour{
   endDate: string;   // ISO date string
   description: string;
   imageUrl: string;
+  tags: { id: string; name: string }[]; // Added tags field
+  categories: { id: string; name: string }[]; // Added categories field
 }
 export interface TourFormInput {
   name: string;
@@ -20,6 +22,8 @@ export interface TourFormInput {
   startDate: string; // ISO format
   endDate: string;   // ISO format
   description: string;
+  tags: string[]; // Added tags field (array of tag IDs)
+  categories: string[]; // Added categories field (array of category IDs)
 }
 
 export interface CreateUserRequest {
@@ -52,9 +56,13 @@ export interface CreateBookingRequest {
 
 export interface Booking {
   id: string;
+  userId: string; // Added userId field
   username: string;
   tourId: string;
+  tourName: string; // Added tourName field
   bookingDate: string;
+  quantity: number; // Added quantity field
+  status: string; // Added status field
 }
 
 export interface Service {
@@ -62,4 +70,15 @@ export interface Service {
   tourId: string;
   name: string;
   description: string;
+}
+
+export interface Tag {
+  id: number;
+  name: string;
+}
+
+export interface Category {
+  id: number;
+  name: string;
+  description: string; // Added description field
 }

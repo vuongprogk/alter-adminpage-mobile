@@ -93,6 +93,18 @@ const Tour = ({
             <span className="font-semibold text-purple-600">End Date:</span>{" "}
             {formatDate(data.endDate)}
           </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Tags:</span>{" "}
+            {data.tags && data.tags.length > 0
+              ? data.tags.map((item) => item.name).join(", ")
+              : "No tags available"}
+          </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Categories:</span>{" "}
+            {data.categories && data.categories.length > 0
+              ? data.categories.map((item) => item.name).join(", ")
+              : "No categories available"}
+          </p>
         </div>
         <div className="mt-6">
           <h2 className="text-2xl font-bold text-purple-700 mb-4">Services</h2>
@@ -110,6 +122,14 @@ const Tour = ({
               ))}
             </ul>
           )}
+          <div className="mt-4 flex justify-center">
+            <button
+              className="bg-gradient-to-r from-green-600 to-green-800 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:from-green-700 hover:to-green-900 hover:scale-105 dark:shadow-none dark:bg-green-700 dark:hover:bg-green-800"
+              onClick={() => navigate(`/service/${params.tourId}/form`)}
+            >
+              Add New Service
+            </button>
+          </div>
         </div>
         <div className="mt-6 flex justify-center">
           <button

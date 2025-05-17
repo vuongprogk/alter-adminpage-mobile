@@ -33,7 +33,7 @@ const getBookingByUsernameRequest = async (username: string): Promise<any> => {
 
 const getAllBooksRequest = async (): Promise<any[]> => {
   try {
-    const res = await sendRequest("/book/GetBooks", "GET");
+    const res = await sendRequest("/book/GetBooksWithDetails", "GET");
     return res.data;
   } catch (error) {
     console.error("Error fetching all books:", error);

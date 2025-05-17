@@ -17,7 +17,11 @@ type ServiceFormInput = {
   description: string;
 };
 
-const ServiceForm = ({ params }: { params?: { serviceId?: string } }) => {
+const ServiceForm = ({
+  params,
+}: {
+  params?: { serviceId?: string; tourId?: string };
+}) => {
   const navigate = useNavigate(); // Always call hooks at the top level
   const isEdit = Boolean(params?.serviceId && params.serviceId !== "");
 
@@ -46,7 +50,7 @@ const ServiceForm = ({ params }: { params?: { serviceId?: string } }) => {
   });
 
   const [form, setForm] = useState<ServiceFormInput>({
-    tourId: "",
+    tourId: params?.tourId || "",
     name: "",
     description: "",
   });
@@ -54,12 +58,12 @@ const ServiceForm = ({ params }: { params?: { serviceId?: string } }) => {
   useEffect(() => {
     if (data && isEdit) {
       setForm({
-        tourId: data.tourId || "",
+        tourId: params?.tourId || data.tourId || "",
         name: data.name || "",
         description: data.description || "",
       });
     }
-  }, [data, isEdit]);
+  }, [data, isEdit, params?.tourId]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -91,17 +95,19 @@ const ServiceForm = ({ params }: { params?: { serviceId?: string } }) => {
           {isEdit ? "Edit Service" : "Create New Service"}
         </h1>
         <form onSubmit={handleSubmit} className="space-y-4">
-          <div>
-            <label className="block text-sm font-medium text-gray-700">
-              Tour ID
-            </label>
-            <Input
-              name="tourId"
-              value={form.tourId}
-              onChange={handleChange}
-              required
-            />
-          </div>
+          {!params?.tourId && (
+            <div>
+              <label className="block text-sm font-medium text-gray-700">
+                Tour ID
+              </label>
+              <Input
+                name="tourId"
+                value={form.tourId}
+                onChange={handleChange}
+                required
+              />
+            </div>
+          )}
           <div>
             <label className="block text-sm font-medium text-gray-700">
               Name

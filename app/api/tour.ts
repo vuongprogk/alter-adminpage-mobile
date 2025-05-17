@@ -78,4 +78,31 @@ const updateTourRequest = async (
   }
 };
 
-export { getAllToursRequest, getTourByIdRequest, createTourRequest, updateTourRequest };
+const updateTourCategoriesAndTagsRequest = async (
+  tourId: string,
+  data: { CategoryIds: number[]; TagIds: number[] }
+): Promise<any> => {
+  try {
+    const body = {
+      categoryIds: data.CategoryIds,
+      tagIds: data.TagIds,
+    };
+    const response = await sendRequest(
+      `/tour/UpdateTourCategoriesAndTags/${tourId}`,
+      "PUT",
+      body
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating tour categories and tags:", error);
+    throw error;
+  }
+};
+
+export {
+  getAllToursRequest,
+  getTourByIdRequest,
+  createTourRequest,
+  updateTourRequest,
+  updateTourCategoriesAndTagsRequest,
+};

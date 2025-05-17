@@ -63,6 +63,29 @@ const columns = [
     header: "End Date",
     cell: ({ row }) => formatDate(row.getValue("endDate")),
   },
+  {
+    accessorKey: "description",
+    header: "Description",
+    cell: ({ row }) => row.getValue("description"),
+  },
+  {
+    accessorKey: "tags",
+    header: "Tags",
+    cell: ({ row }) =>
+      row
+        .getValue("tags")
+        .map((tag) => tag.name)
+        .join(", "),
+  },
+  {
+    accessorKey: "categories",
+    header: "Categories",
+    cell: ({ row }) =>
+      row
+        .getValue("categories")
+        .map((category) => category.name)
+        .join(", "),
+  },
 ];
 
 const Tours = () => {
@@ -138,6 +161,17 @@ const Tours = () => {
                 </p>
                 <p className="text-gray-600">
                   <strong>End Date:</strong> {formatDate(tour.endDate)}
+                </p>
+                <p className="text-gray-600">
+                  <strong>Description:</strong> {tour.description}
+                </p>
+                <p className="text-gray-600">
+                  <strong>Tags:</strong>{" "}
+                  {tour.tags.map((tag) => tag.name).join(", ")}
+                </p>
+                <p className="text-gray-600">
+                  <strong>Categories:</strong>{" "}
+                  {tour.categories.map((category) => category.name).join(", ")}
                 </p>
               </div>
             ))

@@ -36,12 +36,12 @@ const formatDate = (dateString: string) =>
 // Updated columns definition
 const columns: ColumnDef<Book>[] = [
   {
-    accessorKey: "userId",
-    header: "User ID",
+    accessorKey: "username",
+    header: "User Name",
   },
   {
-    accessorKey: "tourId",
-    header: "Tour ID",
+    accessorKey: "tourName",
+    header: "Tour Name",
   },
   {
     accessorKey: "bookingDate",

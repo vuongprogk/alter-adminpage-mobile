@@ -3,9 +3,12 @@ import {
   getTourByIdRequest,
   updateTourRequest,
   createTourRequest,
+  updateTourCategoriesAndTagsRequest,
 } from "~/api/tour";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router";
+import type { Category, Tag } from "~/models/CommonModal";
+import { getCategories, getTags } from "~/api/tourRelevent";
 
 type TourFormInput = {
   name: string;
@@ -62,6 +65,13 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
 
+  const [isModalOpen, setModalOpen] = useState(false);
+  const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
+  const [selectedTags, setSelectedTags] = useState<number[]>([]);
+
+  const [categories, setCategories] = useState<Category[]>([]); // Ensure initialized as empty array
+  const [tags, setTags] = useState<Tag[]>([]); // Ensure initialized as empty array
+
   useEffect(() => {
     if (data && isEdit) {
       setForm({
@@ -72,8 +82,27 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
         startDate: data.startDate?.split("T")[0] || "",
         endDate: data.endDate?.split("T")[0] || "",
       });
+
+      // Pre-select assigned categories and tags
+      setSelectedCategories(
+        data.categories?.map((cat: Category) => cat.id) || []
+      );
+      setSelectedTags(data.tags?.map((tag: Tag) => tag.id) || []); // Fixed incorrect usage
     }
   }, [data, isEdit]);
+
+  useEffect(() => {
+    // Fetch categories and tags when the modal is opened
+    if (isModalOpen) {
+      getCategories()
+        .then((data) => setCategories(data))
+        .catch(() => alert("Failed to fetch categories"));
+
+      getTags()
+        .then((data) => setTags(data))
+        .catch(() => alert("Failed to fetch tags"));
+    }
+  }, [isModalOpen]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -93,6 +122,30 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     mutation.mutate({ data: form, imageFile: imageFile || undefined });
+  };
+
+  const handleModalSubmit = () => {
+    updateTourCategoriesAndTagsRequest(params!.tourId!, {
+      CategoryIds: selectedCategories,
+      TagIds: selectedTags,
+    })
+      .then(() => {
+        alert("Categories and tags updated successfully!");
+        setModalOpen(false);
+      })
+      .catch(() => {
+        alert("Failed to update categories and tags.");
+      });
+  };
+
+  const toggleSelection = (
+    id: number,
+    selectedList: number[],
+    setSelectedList: React.Dispatch<React.SetStateAction<number[]>>
+  ) => {
+    setSelectedList((prev) =>
+      prev.includes(id) ? prev.filter((item) => item !== id) : [...prev, id]
+    );
   };
 
   if (isEdit && isLoading)
@@ -238,6 +291,104 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
             {isEdit ? "Update Tour" : "Create Tour"}
           </button>
         </form>
+
+        <div className="mt-6 text-center">
+          <button
+            className="w-full bg-purple-700 text-white py-3 rounded-lg font-semibold hover:bg-purple-800 transition-all"
+            onClick={() => setModalOpen(true)}
+          >
+            Update Categories and Tags
+          </button>
+        </div>
+
+        {isModalOpen && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+            <div className="bg-white p-6 rounded-lg shadow-lg w-96">
+              <h2 className="text-xl font-bold text-gray-800 mb-4">
+                Update Categories and Tags
+              </h2>
+              <div className="space-y-4">
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Categories
+                  </label>
+                  <div className="space-y-2">
+                    {(categories || []).map(
+                      (
+                        category // Safeguard with fallback to empty array
+                      ) => (
+                        <div key={category.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedCategories.includes(category.id)}
+                            onChange={() =>
+                              toggleSelection(
+                                category.id,
+                                selectedCategories,
+                                setSelectedCategories
+                              )
+                            }
+                            className="mr-2"
+                          />
+                          <div>
+                            <span className="font-semibold">
+                              {category.name}
+                            </span>
+                            <p className="text-sm text-gray-500">
+                              {category.description}
+                            </p>
+                          </div>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Tags
+                  </label>
+                  <div className="space-y-2">
+                    {(tags || []).map(
+                      (
+                        tag // Safeguard with fallback to empty array
+                      ) => (
+                        <div key={tag.id} className="flex items-center">
+                          <input
+                            type="checkbox"
+                            checked={selectedTags.includes(tag.id)}
+                            onChange={() =>
+                              toggleSelection(
+                                tag.id,
+                                selectedTags,
+                                setSelectedTags
+                              )
+                            }
+                            className="mr-2"
+                          />
+                          <span>{tag.name}</span>
+                        </div>
+                      )
+                    )}
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 flex justify-end space-x-4">
+                <button
+                  className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all"
+                  onClick={() => setModalOpen(false)}
+                >
+                  Cancel
+                </button>
+                <button
+                  className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
+                  onClick={handleModalSubmit}
+                >
+                  Save
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );
