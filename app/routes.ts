@@ -16,7 +16,8 @@ export default [
     route("/bookings", "routes/admin/Books.tsx"),
     route("/services", "routes/admin/Services.tsx"),
     route("/service/:tourId?/form/:serviceId?", "routes/admin/ServiceForm.tsx"),
-    route("/service/form/:serviceId?", "routes/admin/ServiceForm.tsx"),
+    route("/services/:tourId",  "routes/admin/ServiceManagement.tsx")
+
   ]),
   layout("routes/auth/AuthLayout.tsx", [
     route("/login", "routes/auth/Login.tsx"),

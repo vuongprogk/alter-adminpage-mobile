@@ -40,6 +40,12 @@ const Tour = ({
         });
   };
 
+  const totalPrice =
+    (data?.price || 0) +
+    (services && services.length > 0
+      ? services.reduce((sum: number, service: any) => sum + (service.price || 0), 0)
+      : 0);
+
   if (isLoading) {
     return <div className="p-6 text-gray-500">Loading tour details...</div>;
   }
@@ -62,7 +68,7 @@ const Tour = ({
           <img
             src={
               data.imageUrl
-                ? `http://localhost:5000/${data.imageUrl}`
+                ? `http://localhost:8080/${data.imageUrl}`
                 : placeholderImage
             }
             alt={data.name}
@@ -82,7 +88,7 @@ const Tour = ({
           <p className="text-gray-700 text-lg">
             <span className="font-semibold text-purple-600">Price:</span>{" "}
             <span className="text-green-600 font-bold">
-              ${data.price.toFixed(2)}
+              ${(data?.price || 0).toFixed(2)}
             </span>
           </p>
           <p className="text-gray-700 text-lg">
@@ -105,6 +111,12 @@ const Tour = ({
               ? data.categories.map((item) => item.name).join(", ")
               : "No categories available"}
           </p>
+          <p className="text-gray-700 text-lg">
+            <span className="font-semibold text-purple-600">Total Price:</span>{" "}
+            <span className="text-green-600 font-bold">
+              ${totalPrice.toFixed(2)}
+            </span>
+          </p>
         </div>
         <div className="mt-6">
           <h2 className="text-2xl font-bold text-purple-700 mb-4">Services</h2>
@@ -117,19 +129,14 @@ const Tour = ({
               {services.map((service: any) => (
                 <li key={service.id} className="text-gray-700">
                   <span className="font-semibold">{service.name}:</span>{" "}
-                  <span>{service.description}</span>
+                  <span>{service.description}</span>{" "}
+                  <span className="text-green-600 font-bold">
+                    (${(service.price || 0).toFixed(2)})
+                  </span>
                 </li>
               ))}
             </ul>
           )}
-          <div className="mt-4 flex justify-center">
-            <button
-              className="bg-gradient-to-r from-green-600 to-green-800 text-white px-6 py-3 rounded-full shadow-lg transition-all duration-300 ease-in-out hover:from-green-700 hover:to-green-900 hover:scale-105 dark:shadow-none dark:bg-green-700 dark:hover:bg-green-800"
-              onClick={() => navigate(`/service/${params.tourId}/form`)}
-            >
-              Add New Service
-            </button>
-          </div>
         </div>
         <div className="mt-6 flex justify-center">
           <button

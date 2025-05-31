@@ -63,6 +63,7 @@ export interface Booking {
   bookingDate: string;
   quantity: number; // Added quantity field
   status: string; // Added status field
+  totalPrice: number; // Added totalPrice field
 }
 
 export interface Service {
@@ -70,6 +71,7 @@ export interface Service {
   tourId: string;
   name: string;
   description: string;
+  price: number;
 }
 
 export interface Tag {

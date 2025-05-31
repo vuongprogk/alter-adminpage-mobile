@@ -4,11 +4,13 @@ import {
   updateTourRequest,
   createTourRequest,
   updateTourCategoriesAndTagsRequest,
+  updateTourServicesRequest,
 } from "~/api/tour";
+import { getServicesRequest, getServiceByTourIdRequest } from "~/api/service";
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router";
 import type { Category, Tag } from "~/models/CommonModal";
 import { getCategories, getTags } from "~/api/tourRelevent";
+import { Link, useNavigate } from "react-router";
 
 type TourFormInput = {
   name: string;
@@ -21,7 +23,6 @@ type TourFormInput = {
 
 const TourForm = ({ params }: { params?: { tourId?: string } }) => {
   const isEdit = Boolean(params?.tourId && params.tourId !== "");
-  console.log("isEdit", isEdit);
   const navigate = useNavigate();
 
   const { data, isLoading, isError } = useQuery({
@@ -65,12 +66,14 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
 
   const [imageFile, setImageFile] = useState<File | null>(null);
 
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [isDetailsModalOpen, setDetailsModalOpen] = useState(false); // New state for unified modal
   const [selectedCategories, setSelectedCategories] = useState<number[]>([]);
   const [selectedTags, setSelectedTags] = useState<number[]>([]);
 
   const [categories, setCategories] = useState<Category[]>([]); // Ensure initialized as empty array
   const [tags, setTags] = useState<Tag[]>([]); // Ensure initialized as empty array
+  const [services, setServices] = useState<{ id: string; name: string }[]>([]);
+  const [selectedServices, setSelectedServices] = useState<string[]>([]);
 
   useEffect(() => {
     if (data && isEdit) {
@@ -93,7 +96,7 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
 
   useEffect(() => {
     // Fetch categories and tags when the modal is opened
-    if (isModalOpen) {
+    if (isDetailsModalOpen) {
       getCategories()
         .then((data) => setCategories(data))
         .catch(() => alert("Failed to fetch categories"));
@@ -102,7 +105,21 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
         .then((data) => setTags(data))
         .catch(() => alert("Failed to fetch tags"));
     }
-  }, [isModalOpen]);
+  }, [isDetailsModalOpen]);
+
+  useEffect(() => {
+    if (params?.tourId) {
+      Promise.all([
+        getServicesRequest(),
+        getServiceByTourIdRequest(params.tourId), // Fetch services assigned to the tour
+      ])
+        .then(([allServices, assignedServices]) => {
+          setServices(allServices);
+          setSelectedServices(assignedServices.map((service) => service.id)); // Pre-select assigned services
+        })
+        .catch(() => alert("Failed to fetch services"));
+    }
+  }, [params?.tourId]);
 
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -124,18 +141,40 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
     mutation.mutate({ data: form, imageFile: imageFile || undefined });
   };
 
-  const handleModalSubmit = () => {
-    updateTourCategoriesAndTagsRequest(params!.tourId!, {
-      CategoryIds: selectedCategories,
-      TagIds: selectedTags,
-    })
-      .then(() => {
-        alert("Categories and tags updated successfully!");
-        setModalOpen(false);
+  const handleDetailsModalSubmit = async () => {
+    try {
+      if (params?.tourId) {
+        await updateTourCategoriesAndTagsRequest(params.tourId, {
+          CategoryIds: selectedCategories,
+          TagIds: selectedTags,
+        });
+        await updateTourServicesRequest(params.tourId, {
+          serviceId: selectedServices,
+        });
+        alert("Tour details updated successfully!");
+        setDetailsModalOpen(false);
+      }
+    } catch {
+      alert("Failed to update tour details.");
+    }
+  };
+
+  const handleServiceChange = (serviceId: string) => {
+    setSelectedServices((prev) =>
+      prev.includes(serviceId)
+        ? prev.filter((id) => id !== serviceId)
+        : [...prev, serviceId]
+    );
+  };
+
+  const handleServiceSubmit = async () => {
+    if (params?.tourId) {
+      await updateTourServicesRequest(params.tourId, {
+        serviceId: selectedServices,
       })
-      .catch(() => {
-        alert("Failed to update categories and tags.");
-      });
+        .then(() => alert("Services updated successfully!"))
+        .catch(() => alert("Failed to update services."));
+    }
   };
 
   const toggleSelection = (
@@ -267,7 +306,7 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
                 />
               ) : isEdit && data?.imageUrl ? (
                 <img
-                  src={`http://localhost:5000/${data.imageUrl}`}
+                  src={`http://localhost:8080/${data.imageUrl}`}
                   alt="Current"
                   className="w-full h-full object-cover rounded-lg"
                 />
@@ -295,17 +334,17 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
         <div className="mt-6 text-center">
           <button
             className="w-full bg-purple-700 text-white py-3 rounded-lg font-semibold hover:bg-purple-800 transition-all"
-            onClick={() => setModalOpen(true)}
+            onClick={() => setDetailsModalOpen(true)}
           >
-            Update Categories and Tags
+            Manage Tour Details
           </button>
         </div>
 
-        {isModalOpen && (
+        {isDetailsModalOpen && (
           <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
             <div className="bg-white p-6 rounded-lg shadow-lg w-96">
               <h2 className="text-xl font-bold text-gray-800 mb-4">
-                Update Categories and Tags
+                Manage Tour Details
               </h2>
               <div className="space-y-4">
                 <div>
@@ -313,34 +352,28 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
                     Categories
                   </label>
                   <div className="space-y-2">
-                    {(categories || []).map(
-                      (
-                        category // Safeguard with fallback to empty array
-                      ) => (
-                        <div key={category.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedCategories.includes(category.id)}
-                            onChange={() =>
-                              toggleSelection(
-                                category.id,
-                                selectedCategories,
-                                setSelectedCategories
-                              )
-                            }
-                            className="mr-2"
-                          />
-                          <div>
-                            <span className="font-semibold">
-                              {category.name}
-                            </span>
-                            <p className="text-sm text-gray-500">
-                              {category.description}
-                            </p>
-                          </div>
+                    {(categories || []).map((category) => (
+                      <div key={category.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedCategories.includes(category.id)}
+                          onChange={() =>
+                            toggleSelection(
+                              category.id,
+                              selectedCategories,
+                              setSelectedCategories
+                            )
+                          }
+                          className="mr-2"
+                        />
+                        <div>
+                          <span className="font-semibold">{category.name}</span>
+                          <p className="text-sm text-gray-500">
+                            {category.description}
+                          </p>
                         </div>
-                      )
-                    )}
+                      </div>
+                    ))}
                   </div>
                 </div>
                 <div>
@@ -348,40 +381,53 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
                     Tags
                   </label>
                   <div className="space-y-2">
-                    {(tags || []).map(
-                      (
-                        tag // Safeguard with fallback to empty array
-                      ) => (
-                        <div key={tag.id} className="flex items-center">
-                          <input
-                            type="checkbox"
-                            checked={selectedTags.includes(tag.id)}
-                            onChange={() =>
-                              toggleSelection(
-                                tag.id,
-                                selectedTags,
-                                setSelectedTags
-                              )
-                            }
-                            className="mr-2"
-                          />
-                          <span>{tag.name}</span>
-                        </div>
-                      )
-                    )}
+                    {(tags || []).map((tag) => (
+                      <div key={tag.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          checked={selectedTags.includes(tag.id)}
+                          onChange={() =>
+                            toggleSelection(tag.id, selectedTags, setSelectedTags)
+                          }
+                          className="mr-2"
+                        />
+                        <span>{tag.name}</span>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+                <div>
+                  <label className="block text-sm font-medium text-gray-700">
+                    Services
+                  </label>
+                  <div className="space-y-2">
+                    {services.map((service) => (
+                      <div key={service.id} className="flex items-center">
+                        <input
+                          type="checkbox"
+                          id={`service-${service.id}`}
+                          checked={selectedServices.includes(service.id)}
+                          onChange={() => handleServiceChange(service.id)}
+                          className="mr-2"
+                        />
+                        <label htmlFor={`service-${service.id}`} className="text-sm">
+                          {service.name}
+                        </label>
+                      </div>
+                    ))}
                   </div>
                 </div>
               </div>
               <div className="mt-6 flex justify-end space-x-4">
                 <button
                   className="bg-gray-300 text-gray-800 py-2 px-4 rounded-lg hover:bg-gray-400 transition-all"
-                  onClick={() => setModalOpen(false)}
+                  onClick={() => setDetailsModalOpen(false)}
                 >
                   Cancel
                 </button>
                 <button
                   className="bg-green-600 text-white py-2 px-4 rounded-lg hover:bg-green-700 transition-all"
-                  onClick={handleModalSubmit}
+                  onClick={handleDetailsModalSubmit}
                 >
                   Save
                 </button>

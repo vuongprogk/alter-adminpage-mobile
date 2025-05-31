@@ -23,7 +23,7 @@ import {
 } from "~/components/ui/table";
 import { Button } from "~/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
-import type { Book } from "~/models/CommonModal";
+import type { Booking } from "~/models/CommonModal";
 
 // Format date utility
 const formatDate = (dateString: string) =>
@@ -55,6 +55,16 @@ const columns: ColumnDef<Book>[] = [
   {
     accessorKey: "status",
     header: "Status",
+  },
+  {
+    accessorKey: "totalPrice",
+    header: "Total Price",
+    cell: ({ row }) => {
+      const totalPrice = row.getValue("totalPrice");
+      return totalPrice !== undefined && totalPrice !== null
+        ? `$${totalPrice.toFixed(2)}`
+        : "N/A";
+    },
   },
 ];
 

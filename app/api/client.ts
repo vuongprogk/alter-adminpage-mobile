@@ -3,7 +3,7 @@ import axios, { type AxiosRequestConfig, type Method } from 'axios';
 const cache = new Map();
 
 export const apiClient = axios.create({
-  baseURL: 'http://localhost:5000/api',
+  baseURL: 'http://localhost:8080/api',
   timeout: 5000,
   headers: {
     'Accept': 'application/json',

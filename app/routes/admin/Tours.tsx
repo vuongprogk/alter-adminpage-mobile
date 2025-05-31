@@ -140,7 +140,7 @@ const Tours = () => {
                   <img
                     src={
                       tour.imageUrl
-                        ? `http://localhost:5000/${tour.imageUrl}`
+                        ? `http://localhost:8080/${tour.imageUrl}`
                         : placeholderImage
                     }
                     alt={tour.name}

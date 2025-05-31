@@ -99,10 +99,31 @@ const updateTourCategoriesAndTagsRequest = async (
   }
 };
 
+const updateTourServicesRequest = async (
+  tourId: string,
+  data: { serviceId: string[] }
+): Promise<any> => {
+  try {
+    const body = {
+      serviceId: data.serviceId,
+    };
+    const response = await sendRequest(
+      `/service/UpdateTourService/${tourId}`,
+      "PUT",
+      body
+    );
+    return response.data;
+  } catch (error) {
+    console.error("Error updating tour services:", error);
+    throw error;
+  }
+};
+
 export {
   getAllToursRequest,
   getTourByIdRequest,
   createTourRequest,
   updateTourRequest,
   updateTourCategoriesAndTagsRequest,
+  updateTourServicesRequest,
 };

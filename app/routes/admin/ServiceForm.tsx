@@ -23,7 +23,7 @@ const ServiceForm = ({
   params?: { serviceId?: string; tourId?: string };
 }) => {
   const navigate = useNavigate(); // Always call hooks at the top level
-  const isEdit = Boolean(params?.serviceId && params.serviceId !== "");
+  const isEdit = Boolean(params?.serviceId && params?.serviceId !== "");
 
   const { data, isLoading, isError } = useQuery({
     enabled: isEdit,
@@ -70,9 +70,13 @@ const ServiceForm = ({
     setForm((prev) => ({ ...prev, [name]: value }));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleEditService = async () => {
     mutation.mutate(form);
+  };
+
+  // Update handleSubmit to delegate to the appropriate function
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
   };
 
   if (isEdit && isLoading)
