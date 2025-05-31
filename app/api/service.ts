@@ -51,10 +51,21 @@ const updateServiceRequest = async (id: string, data: Service): Promise<Service>
   }
 };
 
+const updateTourServicesRequest = async (tourId: string, data: { serviceId: string[] }): Promise<any> => {
+  try {
+    const res = await sendRequest(`/service/UpdateTourServices/${tourId}`, "PUT", data);
+    return res.data;
+  } catch (error) {
+    console.error(`Error updating services for tour ID ${tourId}:`, error);
+    throw error;
+  }
+};
+
 export {
   getServicesRequest,
   getServiceByIdRequest,
   getServiceByTourIdRequest,
   createServiceRequest,
   updateServiceRequest,
+  updateTourServicesRequest,
 };

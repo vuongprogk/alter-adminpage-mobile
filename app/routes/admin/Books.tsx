@@ -34,7 +34,7 @@ const formatDate = (dateString: string) =>
   });
 
 // Updated columns definition
-const columns: ColumnDef<Book>[] = [
+const columns: ColumnDef<Booking>[] = [
   {
     accessorKey: "username",
     header: "User Name",
@@ -60,7 +60,7 @@ const columns: ColumnDef<Book>[] = [
     accessorKey: "totalPrice",
     header: "Total Price",
     cell: ({ row }) => {
-      const totalPrice = row.getValue("totalPrice");
+      const totalPrice = row.getValue("totalPrice") as number;
       return totalPrice !== undefined && totalPrice !== null
         ? `$${totalPrice.toFixed(2)}`
         : "N/A";
@@ -137,7 +137,7 @@ const Books = () => {
                   >
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="p-4">
-                        {cell.column.columnDef.cell
+                        {typeof cell.column.columnDef.cell === 'function'
                           ? cell.column.columnDef.cell(cell.getContext())
                           : cell.getValue()}
                       </TableCell>
