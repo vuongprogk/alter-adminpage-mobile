@@ -1,10 +1,11 @@
 import axios, { type AxiosRequestConfig, type Method } from 'axios';
+import appConfig from '~/config/appConfig';
 
 const cache = new Map();
 
 export const apiClient = axios.create({
-  baseURL: 'http://localhost:8080/api',
-  timeout: 5000,
+  baseURL: appConfig.api.baseUrl,
+  timeout: appConfig.api.timeout,
   headers: {
     'Accept': 'application/json',
   },

@@ -11,6 +11,7 @@ import { useState, useEffect } from "react";
 import type { Category, Tag } from "~/models/CommonModal";
 import { getCategories, getTags } from "~/api/tourRelevent";
 import { Link, useNavigate } from "react-router";
+import appConfig from "~/config/appConfig";
 
 type TourFormInput = {
   name: string;
@@ -306,7 +307,7 @@ const TourForm = ({ params }: { params?: { tourId?: string } }) => {
                 />
               ) : isEdit && data?.imageUrl ? (
                 <img
-                  src={`http://localhost:8080/${data.imageUrl}`}
+                  src={`${appConfig.hosts.imageBaseUrl}/${data.imageUrl}`}
                   alt="Current"
                   className="w-full h-full object-cover rounded-lg"
                 />

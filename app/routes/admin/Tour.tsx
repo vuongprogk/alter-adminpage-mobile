@@ -2,6 +2,7 @@ import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { getTourByIdRequest } from "~/api/tour";
 import { getServiceByTourIdRequest } from "~/api/service"; // Import service API
+import appConfig from "~/config/appConfig";
 
 const Tour = ({
   params,
@@ -56,7 +57,7 @@ const Tour = ({
     );
   }
 
-  const placeholderImage = "https://via.placeholder.com/600x400?text=No+Image";
+  const placeholderImage = appConfig.hosts.external.placeholder;
 
   return (
     <div className="p-8 bg-gradient-to-r from-gray-50 via-purple-50 to-gray-50 min-h-screen">
@@ -68,7 +69,7 @@ const Tour = ({
           <img
             src={
               data.imageUrl
-                ? `http://localhost:8080/${data.imageUrl}`
+                ? `${appConfig.hosts.apiHost}/${data.imageUrl}`
                 : placeholderImage
             }
             alt={data.name}

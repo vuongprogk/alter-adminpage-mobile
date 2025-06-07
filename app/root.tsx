@@ -11,17 +11,18 @@ import type { Route } from "./+types/root";
 import "./app.css";
 import { CookiesProvider } from "react-cookie";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
+import appConfig from "~/config/appConfig";
 
 export const links: Route.LinksFunction = () => [
-  { rel: "preconnect", href: "https://fonts.googleapis.com" },
+  { rel: "preconnect", href: appConfig.hosts.external.fonts.google },
   {
     rel: "preconnect",
-    href: "https://fonts.gstatic.com",
+    href: appConfig.hosts.external.fonts.googleStatic,
     crossOrigin: "anonymous",
   },
   {
     rel: "stylesheet",
-    href: "https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap",
+    href: appConfig.hosts.external.fonts.googleCss,
   },
 ];
 

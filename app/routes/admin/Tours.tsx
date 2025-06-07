@@ -4,6 +4,7 @@ import * as React from "react";
 import { useQuery } from "@tanstack/react-query";
 import { useNavigate } from "react-router";
 import { getAllToursRequest } from "~/api/tour";
+import appConfig from "~/config/appConfig";
 
 import { Button } from "~/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
@@ -102,7 +103,7 @@ const Tours = () => {
     retry: false,
   });
 
-  const placeholderImage = "https://via.placeholder.com/300x200?text=No+Image";
+  const placeholderImage = appConfig.hosts.external.placeholder;
 
   if (isLoading) {
     return <div className="p-6 text-gray-600">Loading tours...</div>;
@@ -140,7 +141,7 @@ const Tours = () => {
                   <img
                     src={
                       tour.imageUrl
-                        ? `http://localhost:8080/${tour.imageUrl}`
+                        ? `${appConfig.hosts.apiHost}/${tour.imageUrl}`
                         : placeholderImage
                     }
                     alt={tour.name}
